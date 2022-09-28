@@ -26,7 +26,7 @@ const usuariosPut = (req = request, res = response) => {
 
 const usuariosPost = (req = request, res = response) => {
     
-    const {nombre, edad} = req = request.body;
+    const {nombre, edad} = req.body;
     
     res.json({
         msg: 'post API controlador',
