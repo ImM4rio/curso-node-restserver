@@ -1,16 +1,20 @@
 // No hace falta, pero así tenemos el intellisense 
 const { response, request } = require('express');
-
+const Usuario = require('../models/usuario');
+const bcrypt = require('bcryptjs');
+const { validationResult } = require( 'express-validator' );
 
 const usuariosGet = (req = request, res = response) => {
 
-    const { q, nombre = 'No name', apikey } = req.query;
+    const { q, nombre = 'No name', apikey, page = 1, limit } = req.query;
 
     res.json({
         msg: 'get API controlador',
         q,
         nombre,
-        apikey
+        apikey,
+        page,
+        limit
     });
 }
 
@@ -24,14 +28,36 @@ const usuariosPut = (req = request, res = response) => {
     });
 }
 
-const usuariosPost = (req = request, res = response) => {
+const usuariosPost = async (req = request, res = response) => {
     
-    const {nombre, edad} = req.body;
-    
+    const errors = validationResult(req);
+
+    if( !errors.isEmpty() ) {
+        return res.status(400).json( errors )
+    }
+
+    const { nombre, correo, password, rol} = req.body;
+    const usuario = new Usuario( {nombre, correo, password, rol} );
+
+    // Verificar correo
+    const existeEmail = await Usuario.findOne({ correo });
+
+    if( existeEmail ) {
+        return res.status(400).json({
+            message: 'Ese correo ya está registrado'
+        })
+    }
+
+    // Encriptar pass
+    const salt = bcrypt.genSaltSync(); // default 10
+    usuario.password = bcrypt.hashSync( password, salt )
+
+    // Guardar en db
+    await usuario.save();
+
     res.json({
         msg: 'post API controlador',
-        nombre,
-        edad
+        usuario
     });
 
 }
