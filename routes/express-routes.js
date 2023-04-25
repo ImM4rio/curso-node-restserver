@@ -21,7 +21,7 @@ const router = Router();
         check('nombre', 'El nombre es obligatorio').not().isEmpty(),
         check('password', 'El password debe tener más de 6 caracteres').isLength({ min: 6 }),
         check('correo', 'El correo no es válido').isEmail(),
-        check( 'correo').custom( emailExiste ),
+        check( 'correo' ).custom( emailExiste ),
         // check('rol', 'No es un rol permitido').isIn([ 'ADMIN_ROLE', 'USER_ROLE']),
         check('rol').custom( esRoleValido ),
         validarCampos
