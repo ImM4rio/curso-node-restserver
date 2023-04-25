@@ -1,8 +1,7 @@
 // No hace falta, pero así tenemos el intellisense 
 const { response, request } = require('express');
-const Usuario = require('../models/usuario');
+const Usuario = require('../models/user');
 const bcrypt = require('bcryptjs');
-const { validationResult } = require( 'express-validator' );
 
 const usuariosGet = (req = request, res = response) => {
 
@@ -29,12 +28,6 @@ const usuariosPut = (req = request, res = response) => {
 }
 
 const usuariosPost = async (req = request, res = response) => {
-    
-    const errors = validationResult(req);
-
-    if( !errors.isEmpty() ) {
-        return res.status(400).json( errors )
-    }
 
     const { nombre, correo, password, rol} = req.body;
     const usuario = new Usuario( {nombre, correo, password, rol} );

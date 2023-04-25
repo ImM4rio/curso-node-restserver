@@ -32,7 +32,12 @@ const UsuarioSchema = Schema({
         default: false
     }
 
-})
+});
 
+// Function mantiene el this
+UsuarioSchema.methods.toJSON = function() {
+    const { __v, password, ...usuario } = this.toObject()
+    return usuario;
+}
 
 module.exports = model ( 'Usuario', UsuarioSchema )

@@ -48,7 +48,7 @@ class Server {
         });
 
         
-        this.app.use(this.usuariosPath, require('../routes/user'))
+        this.app.use(this.usuariosPath, require('../routes/express-routes'))
     }
 
     listen () {
