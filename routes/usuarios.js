@@ -6,9 +6,12 @@ const { usuariosPut,
         usuariosPost, 
         usuariosGet,
         usuariosDelete,
-        usuariosPatch } = require( '../controllers/users' );
+        usuariosPatch } = require( '../controllers/usuarios' );
 
 const { validarCampos } = require( '../middlewares/validar-campos' );
+const { validarJWT } = require( '../middlewares/validar-jwt' );
+const { esAdminRole } = require( '../middlewares/validar-roles' );
+
 const { esRoleValido, emailExiste, existeUsuarioPorID } = require( '../helpers/db-validators' );
 
 const router = Router();
@@ -33,6 +36,8 @@ const router = Router();
     ], usuariosPost);
 
     router.delete('/:id', [
+        validarJWT,
+        esAdminRole,
         check( 'id', 'El id tiene que ser un MongoID').isMongoId(),
         check( 'id' ).custom( existeUsuarioPorID ),
         validarCampos
