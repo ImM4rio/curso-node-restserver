@@ -8,9 +8,7 @@ const { usuariosPut,
         usuariosDelete,
         usuariosPatch } = require( '../controllers/usuarios' );
 
-const { validarCampos } = require( '../middlewares/validar-campos' );
-const { validarJWT } = require( '../middlewares/validar-jwt' );
-const { esAdminRole } = require( '../middlewares/validar-roles' );
+const {validarCampos, validarJWT, tieneRole} = require('../middlewares')
 
 const { esRoleValido, emailExiste, existeUsuarioPorID } = require( '../helpers/db-validators' );
 
@@ -37,7 +35,9 @@ const router = Router();
 
     router.delete('/:id', [
         validarJWT,
-        esAdminRole,
+        // Esto fuerza a que el usuario sea admin 
+        // esAdminRole,
+        tieneRole('ADMIN_ROLE', 'VENTAS_ROLE'),
         check( 'id', 'El id tiene que ser un MongoID').isMongoId(),
         check( 'id' ).custom( existeUsuarioPorID ),
         validarCampos

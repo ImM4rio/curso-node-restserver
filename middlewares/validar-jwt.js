@@ -13,34 +13,34 @@ const validarJWT = async( req = request, res = response, next ) => {
         });
     }
 
-    const uid = jwt.verify( token, process.env.SECRETORPRIVATEKEY, ( error, decoded ) => {
-        if ( error ) {
-            res.status(401).json({
+    try{
+        const { uid } = jwt.verify( token, process.env.SECRETORPRIVATEKEY );
+
+        const usuario = await Usuario.findById( uid );
+
+        req.usuario = usuario;
+        next();
+
+        if ( !usuario ) {
+            return res.status(401).json({
                 msg: 'Token no válido'
-            });
-        } else {
-           return decoded.uid
+            })
         }
-    });
     
-    const usuario = await Usuario.findById( uid );
+        // Verificar si uid tiene estado true
+        if ( !usuario.estado ) {
+            return res.status(401).json({
+                msg: 'Token no válido'
+            })
+        }   
 
-    if ( !usuario ) {
-        return res.status(401).json({
+    }catch ( error ) {
+        console.log( error );
+        res.status(401).json({
             msg: 'Token no válido'
-        })
+        });
     }
-
-    // Verificar si uid tiene estado true
-    if ( !usuario.estado ) {
-        return res.status(401).json({
-            msg: 'Token no válido'
-        })
-    }    
-
-    req.usuario = usuario;
-    next();
-        
+     
 }
 
 module.exports = {
