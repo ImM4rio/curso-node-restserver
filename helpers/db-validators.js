@@ -1,5 +1,4 @@
-const Role = require( '../models/role' );
-const Usuario = require( '../models/user' );
+const { Categoria, Role, Usuario } = require( '../models' );
 
 
 const esRoleValido = async( rol = '' ) => {
@@ -26,8 +25,18 @@ const existeUsuarioPorID = async( id ) => {
     }
 }
 
+const existeCategoriaPorID = async( id ) => {
+
+    const existeCategoria = await Categoria.findById( id );
+
+    if( !existeCategoria ) {
+        throw new Error(`El id: ${id} no está asignado a ninguna categoría`);
+    }
+
+}
 module.exports = {
     esRoleValido,
     emailExiste,
-    existeUsuarioPorID
+    existeUsuarioPorID,
+    existeCategoriaPorID
 }
