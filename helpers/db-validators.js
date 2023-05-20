@@ -26,7 +26,6 @@ const existeUsuarioPorID = async( id ) => {
 }
 
 const existeCategoriaPorID = async( id ) => {
-
     const existeCategoria = await Categoria.findById( id );
 
     if( !existeCategoria ) {

@@ -28,6 +28,18 @@ const categoriasGet = async ( req, res = response ) => {
     });
 }
 
+// Obtener categoria
+
+const obtenerCategoriaPorID = async ( req, res = response ) => {
+
+    const { id } = req.params;
+    const categoria = await Categoria.findById( id ).populate('usuario', 'nombre -_id')
+
+    res.status(200).json(
+        categoria
+    );
+}
+
 
 const crearCategoria = async (req, res = response) => {
 
@@ -62,23 +74,24 @@ const crearCategoria = async (req, res = response) => {
 const actualizarCategoria = async( req, res = response ) => {
 
     const { id } = req.params;
-    const nombre = req.body.nombre.toUpperCase();
-    const { _id, ...usuario} = req.usuario._doc;
-    console.log(usuario)
+    const { estado, usuario, ...data } = req.body;
 
-    if( !usuario ) {
+    data.nombre = data.nombre.toUpperCase();
+    data.usuario = req.usuario;
+
+    if( !data.usuario ) {
         return res.status(400).json({
             msg: `El usuario no existe.`
         });
     }
 
-    if( !usuario.estado ){
+    if( !data.usuario.estado ){
         return res.status(400).json({
-            msg: `El usuario ${usuario.nombre} está deshabilitado, contacte con el administrador.`
+            msg: `El usuario ${data.usuario.nombre} está deshabilitado, contacte con el administrador.`
         });
     } 
 
-    const categoria = await Categoria.findByIdAndUpdate( id, { nombre, usuario: _id });
+    const categoria = await Categoria.findByIdAndUpdate( id, data, { new: true });
 
     res.status(200).json({
         msg: 'PUT - actualizar registro por ID',
@@ -105,6 +118,7 @@ const borrarCategoria = async( req, res = response ) => {
 module.exports = {
     crearCategoria,
     categoriasGet,
+    obtenerCategoriaPorID,
     actualizarCategoria,
     borrarCategoria
 }
