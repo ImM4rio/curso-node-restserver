@@ -64,7 +64,7 @@ const crearCategoria = async (req, res = response) => {
     const categoria = new Categoria( data );
 
     // Guardar DB
-    await categoria.save()
+    await categoria.save();
 
     res.status(201).json( categoria );
 }
@@ -104,7 +104,7 @@ const actualizarCategoria = async( req, res = response ) => {
 const borrarCategoria = async( req, res = response ) => {
     const { id } = req.params;
 
-    const categoria = await Categoria.findByIdAndUpdate( id, {estado: false} );
+    const categoria = await Categoria.findByIdAndUpdate( id, {estado: false}, { new: true });
 
     const usuarioAutenticado = req.usuario;
 

@@ -25,7 +25,7 @@ router.post( '/', [
         validarJWT,
         check('nombre', 'El nombre es obligatorio.').not().isEmpty(),
         validarCampos
-    ],crearCategoria
+    ], crearCategoria
 );
 
 // Actualizar registro por id - privado - cualquiera con un token válido
