@@ -3,11 +3,13 @@
 const { response } = require( "express" );
 const { Producto, Categoria } = require( "../models" );
 
-
 const crearProducto = async( req, res = response ) => {
 
-    const nombre = req.body.nombre.toUpperCase();
-    const categoria = req.body.categoria.toUpperCase();
+
+    const { estado, usuario, ...body } = req.body;
+
+    const nombre = body.nombre.toUpperCase();
+    const categoria = body.categoria.toUpperCase();
 
     const [ productoDB, categoriaDB ] = await Promise.all(
         [
@@ -18,7 +20,7 @@ const crearProducto = async( req, res = response ) => {
                     select: 'nombre corre -_id'
                 }),
             Categoria
-                .findOne({ nombre: categoria })
+                .findById( categoria )
         ]
     );
 
@@ -63,6 +65,7 @@ const productosGet = async ( req, res = response ) => {
                     path: 'usuario',
                     select: 'nombre correo -_id'
                 })
+                .populate( 'categoria' )
         ]
     );
 
@@ -77,6 +80,8 @@ const obtenerProductoPorID = async ( req, res = response ) => {
 
     const { id } = req.params;
     const producto = await Producto.findById( id )
+                            .populate('usuario', 'nombre')
+                            .populate('categoria', 'nombre');
 
     res.status(200).json(
         producto
@@ -88,20 +93,8 @@ const actualizarProducto = async( req, res = response ) => {
     const { id } = req.params;
     const { estado, usuario, ...data } = req.body;
 
-    data.nombre = data.nombre.toUpperCase();
+    data.nombre = data.nombre?.toUpperCase();
     data.usuario = req.usuario;
-
-    if( !data.usuario ) {
-        return res.status(400).json({
-            msg: `El usuario no existe.`
-        });
-    }
-
-    if( !data.usuario.estado ){
-        return res.status(400).json({
-            msg: `El usuario ${data.usuario.nombre} está deshabilitado, contacte con el administrador.`
-        });
-    } 
 
     const producto = await Producto.findByIdAndUpdate( id, data, { new: true });
 

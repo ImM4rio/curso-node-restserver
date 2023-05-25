@@ -1,9 +1,13 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 
-const { crearProducto, productosGet, obtenerProductoPorID, actualizarProducto, borrarProducto } = require( '../controllers/productos' );
+const { crearProducto, 
+        productosGet, 
+        obtenerProductoPorID, 
+        actualizarProducto, 
+        borrarProducto } = require( '../controllers/productos' );
 const { validarJWT, validarCampos, tieneRole } = require( '../middlewares' );
-const { existeProductoPorID } = require( '../helpers/db-validators' );
+const { existeProductoPorID, existeCategoriaPorID } = require( '../helpers/db-validators' );
 
 
 const router = new Router();
@@ -26,6 +30,8 @@ router.post( '/', [
     validarJWT,
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('categoria', 'La categoria es obligatoria').not().isEmpty(),
+    check('categoria', 'El ID de la categoría tiene que ser un MongoID válido').isMongoId(),
+    check('categoria').custom( existeCategoriaPorID ),
     validarCampos
 ], crearProducto
 );
@@ -33,7 +39,6 @@ router.post( '/', [
 // Actualizar registro por id - privado - cualquiera con un token válido
 router.put( '/:id', [
     validarJWT,
-    check('nombre', 'El nombra es obligarotio').not().isEmpty(),
     tieneRole('ADMIN_ROLE'),
     check('id', 'El ID tiene que ser un MongoID').isMongoId(),
     check('id').custom( existeProductoPorID ),
